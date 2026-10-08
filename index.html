@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>YAZU CTF</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="brand">
+        <span class="brand-name">YAZU CTF</span>
+        <span class="brand-tag">mini-project</span>
+      </div>
+      <div class="header-right">
+        <span class="score">Score: <span id="score">0</span>/<span id="total">1000</span></span>
+        <input id="player" class="player-input" value="guest" spellcheck="false" />
+        <button id="newgame" class="newgame-btn">New Game</button>
+        <button id="reset" class="reset-btn">Reset</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-title">Challenges</div>
+        <nav id="challenge-list"></nav>
+        <div class="leaderboard">
+          <div class="sidebar-title">Leaderboard</div>
+          <ol id="leaderboard"></ol>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="challenge-header">
+          <div class="challenge-title-row">
+            <h2 id="ch-title">—</h2>
+            <span id="ch-cat" class="badge"></span>
+            <span id="ch-pts" class="badge badge-pts"></span>
+          </div>
+          <p id="ch-desc" class="challenge-desc"></p>
+        </section>
+
+        <div class="panes">
+          <div class="pane-tabs" id="pane-tabs" hidden>
+            <button class="pane-tab active" data-pane="terminal">Terminal</button>
+            <button class="pane-tab" data-pane="browser">Browser</button>
+          </div>
+
+          <section class="terminal" id="terminal-panel">
+            <div class="terminal-output" id="terminal-output"></div>
+            <div class="terminal-input-row">
+              <span class="prompt">$</span>
+              <input id="terminal-input" class="terminal-input" autocomplete="off"
+                     autocapitalize="off" spellcheck="false" placeholder="type a command…" />
+            </div>
+          </section>
+
+          <section class="browser" id="browser-panel" hidden>
+            <div class="browser-toolbar">
+              <button class="browser-btn" id="browser-back" title="Back" disabled>◀</button>
+              <button class="browser-btn" id="browser-forward" title="Forward" disabled>▶</button>
+              <button class="browser-btn" id="browser-reload" title="Reload">⟳</button>
+              <input class="browser-url" id="browser-url" spellcheck="false"
+                     placeholder="http://target/" autocomplete="off" autocapitalize="off" />
+              <button class="browser-btn browser-go" id="browser-go">Go</button>
+            </div>
+            <div class="browser-viewport" id="browser-viewport"></div>
+          </section>
+        </div>
+
+        <section class="flag-row" id="flag-row"></section>
+      </main>
+    </div>
+  </div>
+
+  <script src="md5.js"></script>
+  <script src="challenges.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
