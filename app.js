@@ -30,7 +30,6 @@ function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 
 let state = loadState();
 let selectedId = null;
-let displayedScore = state.score;
 
 const challengeSession = {};
 function resetSession(challengeOrId) {
@@ -41,13 +40,11 @@ function resetSession(challengeOrId) {
 let pendingPrompt = null;
 const browserState = { history: [], index: -1 };
 
-// Difficulty derived from points
 function difficultyOf(c) {
   if (c.points >= 200) return "hard";
   if (c.points >= 150) return "medium";
   return "easy";
 }
-
 
 // ════════════════════════════════════════════════════════════
 // DOM
@@ -64,6 +61,7 @@ const el = {
 
   progressPanel:   document.getElementById("progress-panel"),
   progressToggle:  document.getElementById("progress-toggle"),
+  progressToggleLabel: document.getElementById("progress-toggle-label"),
   progressBarFill: document.getElementById("progress-bar-fill"),
   statSolved:      document.getElementById("stat-solved"),
   statTotal:       document.getElementById("stat-total"),
@@ -133,7 +131,7 @@ function showChallenge(id) {
 }
 
 // ════════════════════════════════════════════════════════════
-// LIBRARY — RENDER
+// LIBRARY
 // ════════════════════════════════════════════════════════════
 function renderLibrary() {
   renderProgress();
@@ -175,6 +173,16 @@ function renderProgress() {
     chip.append(name, bar, count);
     el.progressPerCat.appendChild(chip);
   }
+
+  updateProgressToggleLabel();
+}
+
+function updateProgressToggleLabel() {
+  if (!el.progressToggleLabel) return;
+  const solved = state.solved.length;
+  const total  = window.CHALLENGES.length;
+  const pct    = total ? Math.round((solved / total) * 100) : 0;
+  el.progressToggleLabel.textContent = `Progress Tracker · ${solved}/${total} · ${pct}%`;
 }
 
 function applyFilters(list) {
@@ -213,22 +221,18 @@ function renderGrid() {
   }
   el.noResults.hidden = true;
 
-  for (const c of list) {
-    el.grid.appendChild(buildCard(c));
-  }
+  for (const c of list) el.grid.appendChild(buildCard(c));
 }
 
 function buildCard(c) {
   const solved = state.solved.includes(c.id);
   const diff   = difficultyOf(c);
 
-
   const card = document.createElement("div");
   card.className = "ch-card" + (solved ? " solved" : "");
   card.setAttribute("role", "button");
   card.setAttribute("tabindex", "0");
 
-  // Top row
   const top = document.createElement("div");
   top.className = "ch-card-top";
   const title = document.createElement("div");
@@ -239,12 +243,10 @@ function buildCard(c) {
   catBadge.textContent = c.category;
   top.append(title, catBadge);
 
-  // Author
   const author = document.createElement("div");
   author.className = "ch-card-author";
   author.textContent = "by YAZU Team";
 
-  // Difficulty
   const diffWrap = document.createElement("div");
   diffWrap.className = "ch-card-diff diff-" + diff;
   const bars = document.createElement("span");
@@ -259,11 +261,9 @@ function buildCard(c) {
   diffLabel.textContent = diff.charAt(0).toUpperCase() + diff.slice(1);
   diffWrap.append(bars, diffLabel);
 
-  // Divider (flexible spacer)
   const divider = document.createElement("div");
   divider.className = "ch-card-divider";
 
-  // Footer
   const footer = document.createElement("div");
   footer.className = "ch-card-footer";
   const track = document.createElement("span");
@@ -350,7 +350,7 @@ function renderHeaderScores() {
   const solved = state.solved.length;
   const total  = window.CHALLENGES.length;
   const pct    = total ? (solved / total) * 100 : 0;
-  el.libScore.textContent = state.score;
+  el.libScore.textContent  = state.score;
   el.chalScore.textContent = state.score;
   el.libTotal.textContent  = TOTAL;
   el.chalTotal.textContent = TOTAL;
@@ -399,9 +399,7 @@ function deriveChipsFromHelp(helpLines) {
     if (stepMatch) {
       let cmd = stepMatch[1].trim();
       cmd = cmd.split(/\s{2,}/)[0];
-      if (cmd && cmd.length < 50 && !cmd.includes("submit") && !cmd.includes("<")) {
-        out.push(cmd);
-      }
+      if (cmd && cmd.length < 50 && !cmd.includes("submit") && !cmd.includes("<")) out.push(cmd);
     }
   }
   return [...new Set(out)];
@@ -1164,7 +1162,6 @@ function setPlayer(name) {
 function resetProgress() {
   if (!confirm("Reset all progress?")) return;
   state = defaultState(); saveState();
-  displayedScore = 0;
   renderHeaderScores();
   if (selectedId) renderChallenge();
   else renderLibrary();
@@ -1190,6 +1187,8 @@ el.backToLibrary.addEventListener("click", showLibrary);
 
 el.progressToggle.addEventListener("click", () => {
   el.progressPanel.classList.toggle("collapsed");
+  el.progressToggle.setAttribute("aria-expanded", String(!el.progressPanel.classList.contains("collapsed")));
+  updateProgressToggleLabel();
 });
 
 el.filterSearch.addEventListener("input", renderGrid);
@@ -1242,6 +1241,13 @@ for (const cat of window.CATEGORIES) {
   opt.value = cat;
   opt.textContent = cat;
   el.filterCategory.appendChild(opt);
+}
+
+// On mobile, start with the Progress Tracker collapsed so the grid is visible.
+const isMobile = window.matchMedia("(max-width: 700px)").matches;
+if (isMobile) {
+  el.progressPanel.classList.add("collapsed");
+  el.progressToggle.setAttribute("aria-expanded", "false");
 }
 
 renderHeaderScores();

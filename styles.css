@@ -3,19 +3,41 @@ html, body {
   margin: 0; height: 100%;
   background: #050505; color: #e5e7eb;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-text-size-adjust: 100%;
 }
 button { cursor: pointer; font-family: inherit; }
 input, select { font-family: inherit; }
 
-.view { display: flex; flex-direction: column; height: 100vh; }
+/* ─── VIEWS ─── */
+.view {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
 .view[hidden] { display: none; }
+
+/* Library view — everything scrolls together as one page */
+#library-view { position: relative; }
+.library-scroll {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Challenge view — fixed chrome, scrolling body */
+#challenge-view {
+  display: flex;
+  flex-direction: column;
+}
 
 /* ══════════════════ LIBRARY HEADER ══════════════════ */
 .lib-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 22px 40px 18px;
-  gap: 20px;
-  flex-wrap: wrap;
+  gap: 20px; flex-wrap: wrap;
+  flex-shrink: 0;
 }
 .lib-title { font-size: 26px; font-weight: 700; color: #fff; margin: 0; letter-spacing: -0.3px; }
 .lib-header-right { display: flex; align-items: center; gap: 12px; font-size: 13px; }
@@ -56,6 +78,7 @@ input, select { font-family: inherit; }
   border: 1px solid #1a1a1a;
   border-radius: 12px;
   overflow: hidden;
+  flex-shrink: 0;
 }
 .progress-toggle {
   width: 100%; text-align: left;
@@ -65,6 +88,10 @@ input, select { font-family: inherit; }
   color: #e5e7eb; font-size: 14px; font-weight: 600;
 }
 .progress-toggle:hover { background: rgba(255,255,255,0.02); }
+.progress-toggle-label {
+  font-family: ui-monospace, monospace;
+  font-size: 13px; letter-spacing: 0.3px;
+}
 .progress-chevron { color: #6b7280; transition: transform 0.2s; font-size: 12px; }
 .progress-panel.collapsed .progress-chevron { transform: rotate(-90deg); }
 .progress-panel.collapsed .progress-body { display: none; }
@@ -103,7 +130,7 @@ input, select { font-family: inherit; }
 .progress-cat-chip .cat-count { color: #6b7280; font-family: ui-monospace, monospace; }
 
 /* ══════════════════ FILTERS ══════════════════ */
-.filters { padding: 0 40px 20px; }
+.filters { padding: 0 40px 20px; flex-shrink: 0; }
 .filters-row { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
 .filters-row.toggles { align-items: center; }
 .filter-search {
@@ -146,9 +173,7 @@ input, select { font-family: inherit; }
 
 /* ══════════════════ GRID ══════════════════ */
 .challenge-grid {
-  flex: 1; min-height: 0;
   padding: 0 40px 40px;
-  overflow-y: auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
@@ -217,7 +242,7 @@ input, select { font-family: inherit; }
 }
 .ch-card-track { display: flex; align-items: center; gap: 6px; }
 .ch-card-track-icon { opacity: 0.6; font-size: 12px; }
-.ch-card-stat { display: flex; align-items: center; gap: 4px; color: #6b7280; }
+.ch-card-stat { display: flex; align-items: center; gap: 4px; color: #6b7280; font-family: ui-monospace, monospace; }
 .ch-card-solved-badge {
   color: #34d399; font-weight: 600;
   display: flex; align-items: center; gap: 4px;
@@ -234,6 +259,8 @@ input, select { font-family: inherit; }
   padding: 14px 24px;
   gap: 16px; flex-wrap: wrap;
   border-bottom: 1px solid #1a1a1a;
+  flex-shrink: 0;
+  background: #050505;
 }
 .btn-back {
   background: transparent; color: #9ca3af;
@@ -256,6 +283,7 @@ input, select { font-family: inherit; }
 .chal-main {
   flex: 1; min-height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 28px 32px 40px;
 }
 .challenge-header { margin-bottom: 20px; animation: fade-in 0.3s ease; }
@@ -389,13 +417,13 @@ input, select { font-family: inherit; }
 
 /* ══════════════════ FOOTER ══════════════════ */
 .footer {
-  flex: 0 0 auto;
   border-top: 1px solid #1a1a1a;
   background: #050505;
   padding: 14px 40px;
   display: flex; justify-content: space-between; align-items: center;
   gap: 20px; flex-wrap: wrap;
   font-size: 12px; color: #4b5563;
+  margin-top: auto;
 }
 .footer-left { color: #34d399; font-family: ui-monospace, monospace; font-weight: 600; letter-spacing: 1px; }
 .footer-right { color: #4b5563; font-size: 11px; letter-spacing: 0.5px; }
@@ -423,62 +451,135 @@ input, select { font-family: inherit; }
 @keyframes toast-in  { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes toast-out { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
 
-/* ══════════════════ RESPONSIVE ══════════════════ */
-@media (max-width: 700px) {
-  .lib-header, .filters { padding-left: 20px; padding-right: 20px; }
-  .progress-panel { margin-left: 20px; margin-right: 20px; }
-  .challenge-grid { padding-left: 20px; padding-right: 20px; }
-  .chal-main { padding: 20px; }
-  .progress-row { grid-template-columns: repeat(2, 1fr); }
-  .lib-title { font-size: 20px; }
+/* ══════════════════ RESPONSIVE — TABLET ══════════════════ */
+@media (max-width: 960px) {
+  .lib-header { padding: 18px 24px 14px; }
+  .progress-panel { margin: 0 24px 18px; }
+  .filters { padding: 0 24px 18px; }
+  .challenge-grid { padding: 0 24px 32px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .chal-main { padding: 24px; }
+  .footer { padding: 12px 24px; }
 }
 
-/* ══════════════════ CHALLENGE ASSET PREVIEW ══════════════════ */
-.chal-preview {
-  margin: 0 0 16px;
-  background: #0d0d0d;
-  border: 1px solid #1a1a1a;
-  border-radius: 10px;
-  overflow: hidden;
-  animation: fade-in 0.35s ease;
+/* ══════════════════ RESPONSIVE — MOBILE ══════════════════ */
+@media (max-width: 700px) {
+  .lib-header {
+    padding: 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .lib-title { font-size: 22px; text-align: center; }
+  .lib-header-right { flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .lib-header-right .lib-score { order: -1; width: 100%; text-align: center; margin-bottom: 2px; font-size: 12px; }
+  .player-input { width: 100%; max-width: 220px; padding: 9px 12px; font-size: 14px; }
+  .btn-secondary, .btn-danger { flex: 1 1 auto; min-width: 0; padding: 9px 14px; font-size: 13px; }
+
+  .progress-panel { margin: 0 16px 16px; border-radius: 10px; }
+  .progress-toggle { padding: 12px 16px; font-size: 13px; }
+  .progress-toggle-label { font-size: 12px; }
+  .progress-body { padding: 0 16px 16px; }
+  .progress-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .progress-stat { padding: 10px 6px; }
+  .progress-stat-num { font-size: 18px; }
+  .progress-stat-label { font-size: 10px; letter-spacing: 0.5px; }
+  .progress-cat-chip { font-size: 11px; padding: 4px 10px; }
+  .progress-cat-chip .cat-bar { width: 30px; }
+
+  .filters { padding: 0 16px 16px; }
+  .filters-row { gap: 8px; flex-direction: column; }
+  .filters-row.toggles { flex-direction: row; flex-wrap: wrap; }
+  .filter-search { min-width: 100%; font-size: 15px; padding: 12px 14px; }
+  .filter-select { width: 100%; min-width: 0; font-size: 14px; padding: 12px 32px 12px 14px; }
+  .toggle { padding: 4px 0; }
+  .toggle-track { width: 40px; height: 24px; }
+  .toggle-thumb { width: 20px; height: 20px; }
+  .toggle input:checked + .toggle-track .toggle-thumb { transform: translateX(16px); }
+  .toggle-label { font-size: 13px; }
+  .btn-ghost { flex: 1 1 100%; text-align: center; padding: 8px 14px; font-size: 12px; }
+
+  .challenge-grid { padding: 0 16px 24px; grid-template-columns: 1fr; gap: 12px; }
+  .ch-card { padding: 16px; min-height: auto; }
+  .ch-card:hover { transform: none; }
+  .ch-card-title { font-size: 15px; }
+  .ch-card-cat { font-size: 10px; padding: 3px 8px; }
+  .ch-card-author { font-size: 10px; }
+  .ch-card-diff { font-size: 12px; margin-bottom: 12px; }
+  .ch-card-divider { margin-bottom: 10px; }
+  .ch-card-footer { font-size: 11px; }
+
+  .chal-header { padding: 12px 16px; flex-direction: column; align-items: stretch; gap: 10px; }
+  .btn-back { align-self: flex-start; padding: 8px 14px; font-size: 13px; }
+  .chal-header-right { flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .chal-header-right .lib-score { order: -1; width: 100%; text-align: center; font-size: 12px; margin-bottom: 2px; }
+  .chal-header-right .player-input { flex: 1 1 120px; max-width: none; width: auto; }
+
+  .chal-main { padding: 16px; }
+  .challenge-title-row { gap: 8px; margin-bottom: 10px; }
+  #ch-title { font-size: 20px; }
+  .badge { font-size: 10px; padding: 3px 8px; }
+  .challenge-desc { font-size: 13.5px; line-height: 1.7; padding-left: 12px; }
+
+  .panes { height: 60vh; max-height: 420px; min-height: 280px; margin-top: 14px; }
+  .pane-tab { padding: 10px 16px; font-size: 13px; flex: 1; text-align: center; }
+  .terminal { font-size: 12px; padding: 10px; }
+  .terminal-input { font-size: 13px; }
+  .browser-toolbar { padding: 6px; gap: 4px; }
+  .browser-btn { width: 32px; height: 32px; font-size: 14px; }
+  .browser-url { font-size: 12px; height: 32px; }
+  .browser-go { height: 32px; padding: 0 12px; font-size: 12px; }
+
+  .quick-actions { gap: 6px; margin-top: 10px; }
+  .chip { font-size: 11px; padding: 6px 10px; }
+  .chip-label { font-size: 10px; }
+
+  .flag-row { flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .flag-input { flex: 1 1 100%; font-size: 14px; padding: 12px 14px; }
+  .submit-btn { flex: 1 1 100%; padding: 12px; font-size: 14px; }
+  .solved-banner { padding: 12px 14px; font-size: 12px; }
+
+  .footer { padding: 12px 16px; flex-direction: column; text-align: center; gap: 6px; }
+  .footer-right { font-size: 10px; line-height: 1.5; }
+
+  .toast-container { top: 10px; left: 10px; right: 10px; align-items: stretch; }
+  .toast {
+    max-width: 100%;
+    transform: translateY(-120%);
+    animation: toast-in-mobile 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+  .toast.out { animation: toast-out-mobile 0.3s ease forwards; }
+  @keyframes toast-in-mobile { from { transform: translateY(-120%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes toast-out-mobile { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-120%); opacity: 0; } }
+
+  .no-results { padding: 40px 20px; font-size: 13px; }
 }
-.chal-preview[hidden] { display: none; }
-.chal-preview-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px;
-  border-bottom: 1px solid #1a1a1a;
-  background: #0a0a0a;
+
+/* ══════════════════ VERY SMALL PHONES ══════════════════ */
+@media (max-width: 380px) {
+  .lib-title { font-size: 19px; }
+  .progress-stat-num { font-size: 16px; }
+  .progress-stat-label { font-size: 9px; }
+  .challenge-grid { gap: 10px; }
+  .ch-card { padding: 14px; }
+  .ch-card-title { font-size: 14px; }
+  #ch-title { font-size: 18px; }
+  .panes { height: 55vh; min-height: 240px; }
+  .terminal { font-size: 11.5px; }
 }
-.chal-preview-label {
-  font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
-  color: #4b5563; font-weight: 600;
+
+/* ══════════════════ TOUCH IMPROVEMENTS ══════════════════ */
+@media (hover: none) and (pointer: coarse) {
+  .ch-card:hover { transform: none; }
+  .chip:hover { transform: none; }
+  .submit-btn:hover { transform: none; }
+  .ch-btn { padding-top: 10px; padding-bottom: 10px; }
+  .pane-tab { padding-top: 12px; padding-bottom: 12px; }
+  .browser-btn { min-width: 36px; min-height: 36px; }
 }
-.chal-preview-filename {
-  font-size: 12px;
-  font-family: ui-monospace, monospace;
-  color: #9ca3af;
-  background: #111;
-  padding: 3px 10px;
-  border-radius: 4px;
-  border: 1px solid #1f1f1f;
-}
-.chal-preview-body {
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background:
-    linear-gradient(45deg, #0a0a0a 25%, transparent 25%) 0 0 / 20px 20px,
-    linear-gradient(-45deg, #0a0a0a 25%, transparent 25%) 0 10px / 20px 20px,
-    linear-gradient(45deg, transparent 75%, #0a0a0a 75%) 10px -10px / 20px 20px,
-    linear-gradient(-45deg, transparent 75%, #0a0a0a 75%) -10px 0 / 20px 20px,
-    #0d0d0d;
-  min-height: 180px;
-}
-.chal-preview-img {
-  max-width: 100%;
-  max-height: 220px;
-  border-radius: 6px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
-  display: block;
+
+/* ══════════════════ LANDSCAPE PHONES ══════════════════ */
+@media (max-height: 500px) and (orientation: landscape) {
+  .panes { height: 70vh; max-height: none; }
+  .lib-header { padding: 10px 20px; }
+  .progress-body { padding-top: 4px; }
 }
