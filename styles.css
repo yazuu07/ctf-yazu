@@ -432,3 +432,53 @@ input, select { font-family: inherit; }
   .progress-row { grid-template-columns: repeat(2, 1fr); }
   .lib-title { font-size: 20px; }
 }
+
+/* ══════════════════ CHALLENGE ASSET PREVIEW ══════════════════ */
+.chal-preview {
+  margin: 0 0 16px;
+  background: #0d0d0d;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
+  overflow: hidden;
+  animation: fade-in 0.35s ease;
+}
+.chal-preview[hidden] { display: none; }
+.chal-preview-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #1a1a1a;
+  background: #0a0a0a;
+}
+.chal-preview-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+  color: #4b5563; font-weight: 600;
+}
+.chal-preview-filename {
+  font-size: 12px;
+  font-family: ui-monospace, monospace;
+  color: #9ca3af;
+  background: #111;
+  padding: 3px 10px;
+  border-radius: 4px;
+  border: 1px solid #1f1f1f;
+}
+.chal-preview-body {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(45deg, #0a0a0a 25%, transparent 25%) 0 0 / 20px 20px,
+    linear-gradient(-45deg, #0a0a0a 25%, transparent 25%) 0 10px / 20px 20px,
+    linear-gradient(45deg, transparent 75%, #0a0a0a 75%) 10px -10px / 20px 20px,
+    linear-gradient(-45deg, transparent 75%, #0a0a0a 75%) -10px 0 / 20px 20px,
+    #0d0d0d;
+  min-height: 180px;
+}
+.chal-preview-img {
+  max-width: 100%;
+  max-height: 220px;
+  border-radius: 6px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  display: block;
+}
